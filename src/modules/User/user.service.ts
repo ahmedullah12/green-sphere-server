@@ -1,6 +1,22 @@
 import mongoose from 'mongoose';
-import { TFollowUser, TUnfollowUser } from './user.interface';
+import { TFollowUser, TUnfollowUser, TUser } from './user.interface';
 import { User } from './user.model';
+
+const getUser = async (id: string) => {
+  const result = await User.findById(id)
+    .populate('followers')
+    .populate('following');
+
+  return result;
+};
+
+const updateProfile = async (id: string, payload: Partial<TUser>) => {
+  const user = await User.findById(id);
+
+  const result = await User.findByIdAndUpdate(id, payload, { new: true });
+
+  return result;
+};
 
 const followUser = async (payload: TFollowUser) => {
   const { userId, followedUserId } = payload;
@@ -72,6 +88,8 @@ const unfollowUser = async (payload: TUnfollowUser) => {
 };
 
 export const UserService = {
+  getUser,
+  updateProfile,
   followUser,
   unfollowUser,
 };

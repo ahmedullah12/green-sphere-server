@@ -4,7 +4,7 @@ import { catchAsync } from '../../utils/catchAsync';
 import { AuthServices } from './auth.service';
 
 const registerUser = catchAsync(async (req, res) => {
-  const result = await AuthServices.registerUser(req.body);
+  const result = await AuthServices.registerUser({...JSON.parse(req.body.data), profilePhoto: req.file?.path});
   const { refreshToken, accessToken } = result;
 
   sendResponse(res, {

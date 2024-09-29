@@ -17,6 +17,7 @@ const userSchema = new Schema<TUser, IUserModel>(
         /^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/,
         'Please fill a valid email address',
       ],
+      unique: true,
     },
     password: {
       type: String,

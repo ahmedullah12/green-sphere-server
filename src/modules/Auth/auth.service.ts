@@ -7,7 +7,7 @@ import config from '../../config';
 
 const registerUser = async (payload: TRegisterUser) => {
   // check if the user already exists
-  const user = await User.isUserExists(payload?.email);
+  const user = await User.isUserExistsByEmail(payload?.email);
 
   if (user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is already exist!');
@@ -43,20 +43,17 @@ const registerUser = async (payload: TRegisterUser) => {
 
 const loginUser = async (payload: TLoginUser) => {
   // checking if the user is exist
-  const user = await User.isUserExists(payload?.email);
+  const user = await User.isUserExistsByEmail(payload?.email);
 
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
   }
 
-  console.log(user, payload);
   //checking if the password is correct
   const isPasswordMatched = await User.isPasswordMatched(
     payload?.password,
     user?.password,
   );
-
-  console.log(isPasswordMatched);
 
   if (!isPasswordMatched) {
     throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');

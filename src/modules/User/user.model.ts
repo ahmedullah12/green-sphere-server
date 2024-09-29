@@ -30,6 +30,24 @@ const userSchema = new Schema<TUser, IUserModel>(
       enum: Object.keys(USER_ROLE),
       required: true,
     },
+    followers: {
+      type: [Schema.Types.ObjectId],
+      default: [],
+      ref: "User",
+    },
+    following: {
+      type: [Schema.Types.ObjectId],
+      default: [],
+      ref: "User",
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
@@ -49,8 +67,12 @@ userSchema.set('toJSON', {
   transform: (doc, { password, ...rest }, option) => rest,
 });
 
-userSchema.statics.isUserExists = async function (email) {
+userSchema.statics.isUserExistsByEmail = async function (email) {
   return await User.findOne({ email });
+};
+
+userSchema.statics.isUserExistsById = async function (id) {
+  return await User.findById(id);
 };
 
 userSchema.statics.isPasswordMatched = async function (

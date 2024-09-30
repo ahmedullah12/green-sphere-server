@@ -28,6 +28,36 @@ class QueryBuilder<T> {
 
     return this;
   }
+
+  sort() {
+    let sortBy = '-createdAt';
+
+    if (this.query?.sortBy) {
+      sortBy = this.query.sortBy as string;
+    }
+
+    this.modelQuery = this.modelQuery.sort(sortBy);
+    return this;
+  }
+
+  filter() {
+    const queryObj = { ...this.query };
+    const excludeFields = ['searchTerm', 'page', 'limit', 'sortBy', 'fields'];
+  
+    excludeFields.forEach((e) => delete queryObj[e]);
+  
+    if (queryObj.category) {
+      queryObj.category = { $regex: new RegExp(queryObj.category as string, 'i') };
+    }
+  
+    if (queryObj.tag) {
+      queryObj.tag = { $regex: new RegExp(queryObj.tag as string, 'i') };
+    }
+  
+    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+  
+    return this;
+  }
 }
 
 export default QueryBuilder;

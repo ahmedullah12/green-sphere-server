@@ -14,7 +14,7 @@ const createPost = async(payload: TPost, imageFiles: TImageFiles) => {
 };
 
 const getAllPosts = async(query: Record<string, unknown>) => {
-    const postQuery = new QueryBuilder(Post.find(), query).search(postSearchableFields);
+    const postQuery = new QueryBuilder(Post.find(), query).search(postSearchableFields).sort().filter();
     const result = await postQuery.modelQuery;
 
     return result;

@@ -19,6 +19,10 @@ router.post(
 );
 router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getSinglePost);
+router.put("/:id", PostController.updatePost);
 router.delete("/:id", PostController.deletePost);
+router.put("/action/upvote-post", PostController.upvotePost);
+router.put("/action/downvote-post", PostController.downvotePost);
+
 
 export const PostRoutes = router;

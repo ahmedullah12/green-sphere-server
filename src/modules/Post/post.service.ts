@@ -11,6 +11,22 @@ const createPost = async(payload: TPost, imageFiles: TImageFiles) => {
     return result;
 };
 
+const getAllPosts = async() => {
+    const result = await Post.find();
+
+    return result;
+}
+
+const getSinglePost = async(id: string) => {
+    const result = await Post.findById(id);
+
+    return result;
+}
+
+
+
 export const PostServices = {
     createPost,
+    getAllPosts,
+    getSinglePost
 }

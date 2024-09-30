@@ -17,6 +17,11 @@ const postSchema = new Schema<TPost>({
     type: String,
     required: true,
   },
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "User"
+  },
   category: {
     type: [String],
     enum: Object.keys(POST_CATEGORY),

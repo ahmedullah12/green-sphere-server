@@ -2,9 +2,14 @@ import httpStatus from 'http-status';
 import sendResponse from '../../utils/sendResponse';
 import { catchAsync } from '../../utils/catchAsync';
 import { AuthServices } from './auth.service';
+import AppError from '../../errors/AppError';
 
 const registerUser = catchAsync(async (req, res) => {
-  const result = await AuthServices.registerUser({...JSON.parse(req.body.data), profilePhoto: req.file?.path});
+  if (!req.file) {
+    throw new AppError(400, 'Please upload an image');
+  }
+
+  const result = await AuthServices.registerUser({...req.body, profilePhoto: req.file?.path});
   const { refreshToken, accessToken } = result;
 
   sendResponse(res, {

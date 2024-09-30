@@ -3,6 +3,9 @@ import { AuthValidations } from "./auth.validation";
 import { AuthController } from "./auth.controller";
 import { validateRequest } from "../../middlewares/validateRequest";
 import { multerUpload } from "../../config/multer.config";
+import { ImageFileZodSchema } from "../../zod/image.validation";
+import { parseBody } from "../../middlewares/bodyParser";
+import { validateSingleImageFileRequest } from "../../middlewares/validateImageFileRequest";
 
 
 const router = express.Router();
@@ -10,7 +13,9 @@ const router = express.Router();
 router.post(
   '/register',
   multerUpload.single("image"),
-  // validateRequest(AuthValidations.registerValidationSchema),
+  validateSingleImageFileRequest(ImageFileZodSchema),
+  parseBody,
+  validateRequest(AuthValidations.registerValidationSchema),
   AuthController.registerUser
 );
 router.post(

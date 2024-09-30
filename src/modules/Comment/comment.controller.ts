@@ -26,7 +26,33 @@ const getComments = catchAsync(async (req, res) => {
   });
 });
 
+const updateComments = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CommentServices.updateComments(id, req.body);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comments Updated Successfully!!!',
+    data: result,
+  });
+});
+
+const deleteComments = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await CommentServices.deleteComments(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Comments Deleted Successfully!!!',
+    data: result,
+  });
+});
+
 export const CommentController = {
   createComment,
   getComments,
+  updateComments,
+  deleteComments,
 };

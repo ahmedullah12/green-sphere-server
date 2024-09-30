@@ -13,7 +13,26 @@ const getComments = async (postId: string) => {
   return result;
 };
 
+const updateComments = async (
+  commentId: string,
+  comment: Partial<TComment>,
+) => {
+  const result = await Comment.findByIdAndUpdate(commentId, comment, {
+    new: true,
+  });
+
+  return result;
+};
+
+const deleteComments = async(id: string) => {
+    const result = await Comment.findByIdAndDelete(id);
+
+    return result;
+}
+
 export const CommentServices = {
   createComment,
   getComments,
+  updateComments,
+  deleteComments,
 };

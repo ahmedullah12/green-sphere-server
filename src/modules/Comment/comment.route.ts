@@ -10,6 +10,12 @@ router.post(
   validateRequest(CommentValidations.createCommentValidationSchema),
   CommentController.createComment,
 );
-router.get("/:id", CommentController.getComments)
+router.get('/:id', CommentController.getComments);
+router.put(
+  '/:id',
+  validateRequest(CommentValidations.updateCommentValidationSchema),
+  CommentController.updateComments,
+);
+router.delete('/:id', CommentController.deleteComments);
 
 export const CommentRoutes = router;

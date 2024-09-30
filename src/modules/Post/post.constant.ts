@@ -15,3 +15,6 @@ export const POST_TAG = {
     BASIC: "BASIC",
     PREMIUM: "PREMIUM"
 } as const;
+
+
+export const postSearchableFields = ["title", "description", "category"]

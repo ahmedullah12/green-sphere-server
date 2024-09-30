@@ -19,5 +19,6 @@ router.post(
 );
 router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getSinglePost);
+router.delete("/:id", PostController.deletePost);
 
 export const PostRoutes = router;

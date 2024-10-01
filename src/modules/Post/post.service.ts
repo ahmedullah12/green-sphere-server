@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { TImageFiles } from '../../types/image.type';
+import { TImageFiles } from '../../interface/image.type';
 import { postSearchableFields } from './post.constant';
 import { TPost } from './post.interface';
 import { Post } from './post.model';

@@ -1,5 +1,5 @@
 import httpStatus from 'http-status';
-import { TImageFiles } from '../../types/image.type';
+import { TImageFiles } from '../../interface/image.type';
 import { catchAsync } from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { PostServices } from './post.service';
@@ -69,7 +69,10 @@ const deletePost = catchAsync(async (req, res) => {
 const upvotePost = catchAsync(async (req, res) => {
   const { postId, userId } = req.query;
 
-  const result = await PostServices.upvotePost(postId as string, userId as string);
+  const result = await PostServices.upvotePost(
+    postId as string,
+    userId as string,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -82,7 +85,10 @@ const upvotePost = catchAsync(async (req, res) => {
 const downvotePost = catchAsync(async (req, res) => {
   const { postId, userId } = req.query;
 
-  const result = await PostServices.downvotePost(postId as string, userId as string);
+  const result = await PostServices.downvotePost(
+    postId as string,
+    userId as string,
+  );
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

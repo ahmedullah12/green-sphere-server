@@ -4,6 +4,8 @@ import { TLoginUser, TRegisterUser } from './auth.interface';
 import { createToken } from '../../utils/verifyJwt';
 import { User } from '../User/user.model';
 import config from '../../config';
+import mongoose from 'mongoose';
+import bcrypt from "bcrypt";
 
 const registerUser = async (payload: TRegisterUser) => {
   // check if the user already exists
@@ -86,7 +88,40 @@ const loginUser = async (payload: TLoginUser) => {
 };
 
 
+const changePassword = async (
+  userId: string,
+  payload: { oldPassword: string; newPassword: string },
+) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsById(userId);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+
+  //checking if the password is correct
+  if (!(await User.isPasswordMatched(payload.oldPassword, user?.password)))
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
+
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    12,
+  );
+
+  await User.findByIdAndUpdate(
+    user._id,
+    {
+      password: newHashedPassword,
+    },
+  );
+
+  return null;
+};
+
+
 export const AuthServices = {
     registerUser,
     loginUser,
+    changePassword,
 }

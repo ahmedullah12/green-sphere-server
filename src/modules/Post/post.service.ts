@@ -17,12 +17,13 @@ const createPost = async (payload: TPost, imageFiles: TImageFiles) => {
 };
 
 const getAllPosts = async (query: Record<string, unknown>) => {
-  const postQuery = new QueryBuilder(Post.find(), query)
+  const postQuery = new QueryBuilder(Post.find().populate('userId'), query)
     .search(postSearchableFields)
     .sort()
     .filter();
   const result = await postQuery.modelQuery;
 
+  console.log(result);
   return result;
 };
 

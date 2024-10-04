@@ -54,7 +54,7 @@ class QueryBuilder<T> {
       queryObj.tag = { $regex: new RegExp(queryObj.tag as string, 'i') };
     }
   
-    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>);
+    this.modelQuery = this.modelQuery.find(queryObj as FilterQuery<T>).sort("-upvotes");
   
     return this;
   }

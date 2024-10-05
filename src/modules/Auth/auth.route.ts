@@ -28,6 +28,17 @@ router.put(
   validateRequest(AuthValidations.changePasswordValidationSchema),
   AuthController.changePassword
 );
+router.post(
+  '/forget-password',
+  validateRequest(AuthValidations.forgetPasswordValidationSchema),
+  AuthController.forgetPassword,
+);
+
+router.post(
+  '/reset-password',
+  validateRequest(AuthValidations.forgetPasswordValidationSchema),
+  AuthController.resetPassword,
+);
 
 
 

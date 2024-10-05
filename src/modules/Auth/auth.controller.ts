@@ -9,7 +9,10 @@ const registerUser = catchAsync(async (req, res) => {
     throw new AppError(400, 'Please upload an image');
   }
 
-  const result = await AuthServices.registerUser({...req.body, profilePhoto: req.file?.path});
+  const result = await AuthServices.registerUser({
+    ...req.body,
+    profilePhoto: req.file?.path,
+  });
   const { refreshToken, accessToken } = result;
 
   sendResponse(res, {
@@ -39,20 +42,50 @@ const loginUser = catchAsync(async (req, res) => {
 });
 
 const changePassword = catchAsync(async (req, res) => {
-  const {userId} = req.params;
+  const { userId } = req.params;
   const result = await AuthServices.changePassword(userId, req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Password Changed Successfully!',
-    data: {
-    },
+    data: {},
+  });
+});
+
+const forgetPassword = catchAsync(async (req, res) => {
+  const userEmail = req.body.email;
+  const result = await AuthServices.forgetPassword(userEmail);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Reset link is generated successfully!',
+    data: result,
+  });
+});
+
+const resetPassword = catchAsync(async (req, res) => {
+  const token = req.headers.authorization;
+
+  if (!token) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'Something went wrong !');
+  }
+
+  const result = await AuthServices.resetPassword(req.body, token);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Password reset successfully!',
+    data: result,
   });
 });
 
 export const AuthController = {
-    registerUser,
-    loginUser,
-    changePassword,
-}
+  registerUser,
+  loginUser,
+  changePassword,
+  forgetPassword,
+  resetPassword,
+};

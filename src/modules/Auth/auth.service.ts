@@ -4,8 +4,9 @@ import { TLoginUser, TRegisterUser } from './auth.interface';
 import { createToken } from '../../utils/verifyJwt';
 import { User } from '../User/user.model';
 import config from '../../config';
-import mongoose from 'mongoose';
 import bcrypt from "bcrypt";
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { sendEmail } from '../../utils/sendEmail';
 
 const registerUser = async (payload: TRegisterUser) => {
   // check if the user already exists
@@ -119,9 +120,80 @@ const changePassword = async (
   return null;
 };
 
+const forgetPassword = async (userEmail: string) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsByEmail(userEmail);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+
+  const jwtPayload = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    profilePhoto: user.profilePhoto as string,
+    role: user.role,
+  };
+
+  const resetToken = createToken(
+    jwtPayload,
+    config.access_token_secret as string,
+    '10m',
+  );
+
+  const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken} `;
+
+  sendEmail(user.email, resetUILink);
+
+  console.log(resetUILink);
+};
+
+const resetPassword = async (
+  payload: { email: string; newPassword: string },
+  token: string,
+) => {
+  // checking if the user is exist
+  const user = await User.isUserExistsByEmail(payload?.email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found !');
+  }
+
+  const decoded = jwt.verify(
+    token,
+    config.access_token_secret as string,
+  ) as JwtPayload;
+
+  //localhost:3000?id=A-0001&token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJBLTAwMDEiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3MDI4NTA2MTcsImV4cCI6MTcwMjg1MTIxN30.-T90nRaz8-KouKki1DkCSMAbsHyb9yDi0djZU3D6QO4
+
+  if (payload.email !== decoded.email) {
+    console.log(payload.email, decoded.email);
+    throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden!');
+  }
+
+  //hash new password
+  const newHashedPassword = await bcrypt.hash(
+    payload.newPassword,
+    12,
+  );
+
+  await User.findOneAndUpdate(
+    {
+      email: decoded.email,
+      role: decoded.role,
+    },
+    {
+      password: newHashedPassword,
+    },
+  );
+};
+
 
 export const AuthServices = {
     registerUser,
     loginUser,
     changePassword,
+    forgetPassword,
+    resetPassword
 }

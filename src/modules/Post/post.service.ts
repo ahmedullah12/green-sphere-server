@@ -7,10 +7,7 @@ import { Post } from './post.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 
-const createPost = async (payload: TPost, imageFiles: TImageFiles) => {
-  const { images } = imageFiles;
-  payload.images = images?.map((image) => image.path) || [];
-
+const createPost = async (payload: TPost) => {
   const result = await Post.create(payload);
 
   return result;

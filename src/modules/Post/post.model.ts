@@ -7,11 +7,10 @@ const postSchema = new Schema<TPost>({
   title: {
     type: String,
     required: true,
-    trim: true,
   },
-  images: {
-    type: [String],
-    default: [],
+  image: {
+    type: String,
+    required: true,
   },
   description: {
     type: String,

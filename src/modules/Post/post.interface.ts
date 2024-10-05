@@ -3,7 +3,7 @@ import { POST_CATEGORY, POST_TAG } from "./post.constant";
 
 export type TPost = {
     title: string;
-    images: string[];
+    image: string;
     description: string;
     userId: Types.ObjectId;
     category: (keyof typeof POST_CATEGORY)[];

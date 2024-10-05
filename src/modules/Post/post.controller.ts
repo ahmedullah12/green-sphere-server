@@ -6,10 +6,10 @@ import { PostServices } from './post.service';
 import mongoose from 'mongoose';
 
 const createPost = catchAsync(async (req, res) => {
-  const result = await PostServices.createPost(
-    req.body,
-    req.files as TImageFiles,
-  );
+  const result = await PostServices.createPost({
+    ...req.body,
+    image: req.file,
+  });
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

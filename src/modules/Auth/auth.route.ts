@@ -1,32 +1,33 @@
-import express from "express"
-import { AuthValidations } from "./auth.validation";
-import { AuthController } from "./auth.controller";
-import { validateRequest } from "../../middlewares/validateRequest";
-import { multerUpload } from "../../config/multer.config";
-import { ImageFileZodSchema } from "../../zod/image.validation";
-import { parseBody } from "../../middlewares/bodyParser";
-import { validateSingleImageFileRequest } from "../../middlewares/validateImageFileRequest";
-
+import express from 'express';
+import { AuthValidations } from './auth.validation';
+import { AuthController } from './auth.controller';
+import { validateRequest } from '../../middlewares/validateRequest';
+import { multerUpload } from '../../config/multer.config';
+import { ImageFileZodSchema } from '../../zod/image.validation';
+import { parseBody } from '../../middlewares/bodyParser';
+import { validateSingleImageFileRequest } from '../../middlewares/validateImageFileRequest';
 
 const router = express.Router();
 
 router.post(
   '/register',
-  multerUpload.single("image"),
+  multerUpload.single('image'),
   validateSingleImageFileRequest(ImageFileZodSchema),
   parseBody,
   validateRequest(AuthValidations.registerValidationSchema),
-  AuthController.registerUser
+  AuthController.registerUser,
 );
 router.post(
   '/login',
   validateRequest(AuthValidations.loginValidationSchema),
-  AuthController.loginUser
+  AuthController.loginUser,
 );
+router.post('/refresh-token', AuthController.refreshToken);
+
 router.put(
   '/change-password/:userId',
   validateRequest(AuthValidations.changePasswordValidationSchema),
-  AuthController.changePassword
+  AuthController.changePassword,
 );
 router.post(
   '/forget-password',
@@ -39,7 +40,5 @@ router.post(
   validateRequest(AuthValidations.forgetPasswordValidationSchema),
   AuthController.resetPassword,
 );
-
-
 
 export const AuthRoutes = router;

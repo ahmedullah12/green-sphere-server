@@ -8,7 +8,7 @@ import mongoose from 'mongoose';
 const createPost = catchAsync(async (req, res) => {
   const result = await PostServices.createPost({
     ...req.body,
-    image: req.file,
+    image: req.file?.path,
   });
 
   sendResponse(res, {
@@ -45,6 +45,7 @@ const getSinglePost = catchAsync(async (req, res) => {
 const updatePost = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await PostServices.updatePost(id, req.body);
+  console.log(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

@@ -17,15 +17,15 @@ const getAllPosts = async (query: Record<string, unknown>) => {
   const postQuery = new QueryBuilder(Post.find().populate('userId'), query)
     .search(postSearchableFields)
     .sort()
-    .filter();
+    .filter()
+    .paginate();
   const result = await postQuery.modelQuery;
 
-  console.log(result);
   return result;
 };
 
 const getSinglePost = async (id: string) => {
-  const result = await Post.findById(id);
+  const result = await Post.findById(id).populate("userId");
 
   return result;
 };

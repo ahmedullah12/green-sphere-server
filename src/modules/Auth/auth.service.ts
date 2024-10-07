@@ -89,6 +89,43 @@ const loginUser = async (payload: TLoginUser) => {
 };
 
 
+const refreshToken = async (token: string) => {
+  // checking if the given token is valid
+  const decoded = jwt.verify(
+    token,
+    config.refresh_token_secret as string
+  ) as JwtPayload;
+
+  const { email, iat } = decoded;
+
+  // checking if the user is exist
+  const user = await User.isUserExistsByEmail(email);
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
+  }
+
+
+  const jwtPayload = {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    profilePhoto: user.profilePhoto as string,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.access_token_secret as string,
+    config.access_token_expires_in as string
+  );
+
+  return {
+    accessToken,
+  };
+};
+
+
 const changePassword = async (
   userId: string,
   payload: { oldPassword: string; newPassword: string },
@@ -192,6 +229,7 @@ const resetPassword = async (
 export const AuthServices = {
     registerUser,
     loginUser,
+    refreshToken,
     changePassword,
     forgetPassword,
     resetPassword

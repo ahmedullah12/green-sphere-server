@@ -16,6 +16,7 @@ router.post(
 );
 router.get("/", PostController.getAllPosts);
 router.get("/:id", PostController.getSinglePost);
+router.get("/my-posts/:userId", PostController.getMyPosts);
 router.put("/:id", PostController.updatePost);
 router.delete("/:id", PostController.deletePost);
 router.put("/action/upvote-post", PostController.upvotePost);

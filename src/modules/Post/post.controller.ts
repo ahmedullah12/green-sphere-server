@@ -99,6 +99,19 @@ const downvotePost = catchAsync(async (req, res) => {
   });
 });
 
+
+const getMyPosts = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+  const result = await PostServices.getMyPosts(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Posts Fetched Successfully!!!',
+    data: result,
+  });
+});
+
 export const PostController = {
   createPost,
   getAllPosts,
@@ -107,4 +120,5 @@ export const PostController = {
   deletePost,
   upvotePost,
   downvotePost,
+  getMyPosts,
 };

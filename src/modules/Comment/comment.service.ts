@@ -8,7 +8,7 @@ const createComment = async (payload: TComment) => {
 };
 
 const getComments = async (postId: string) => {
-  const result = await Comment.find({ postId });
+  const result = await Comment.find({ postId }).populate("userId");
 
   return result;
 };

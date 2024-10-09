@@ -75,7 +75,7 @@ const downvotePost = async (postId: string, userId: string) => {
   const post = await Post.findById(postId);
 
   if (!post) {
-    throw new Error('Post not found');
+    throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
   }
 
   const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
@@ -99,6 +99,13 @@ const downvotePost = async (postId: string, userId: string) => {
   return post;
 };
 
+const getMyPosts = async(userId: string) => {
+  const result = await Post.find({userId}).sort("-createdAt").populate("userId");
+
+  return result;
+}
+
+
 export const PostServices = {
   createPost,
   getAllPosts,
@@ -107,4 +114,5 @@ export const PostServices = {
   deletePost,
   upvotePost,
   downvotePost,
+  getMyPosts,
 };

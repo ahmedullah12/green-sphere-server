@@ -181,7 +181,7 @@ const forgetPassword = async (userEmail: string) => {
 
   const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken} `;
 
-  sendEmail(user.email, resetUILink);
+  await sendEmail(user.email, resetUILink);
 
   console.log(resetUILink);
 };

@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import { TFollowUser, TUnfollowUser, TUser } from './user.interface';
 import { User } from './user.model';
+import AppError from '../../errors/AppError';
+import httpStatus from 'http-status';
 
 const getUser = async (id: string) => {
   const result = await User.findById(id)
@@ -12,6 +14,9 @@ const getUser = async (id: string) => {
 
 const updateProfile = async (id: string, payload: Partial<TUser>) => {
   const user = await User.findById(id);
+  if(!user){
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
 
   const result = await User.findByIdAndUpdate(id, payload, { new: true });
 

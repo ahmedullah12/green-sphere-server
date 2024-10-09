@@ -5,6 +5,7 @@ import { PostRoutes } from '../modules/Post/post.route';
 import { CommentRoutes } from '../modules/Comment/comment.route';
 import { PaymentCollectionRoutes } from '../modules/PaymentsCollection/payment-collection.route';
 import { PaymentRoutes } from '../modules/Payment/payment.route';
+import { FavouriteRoutes } from '../modules/Favourites/favourite.route';
 
 const router = express.Router();
 
@@ -20,6 +21,10 @@ const moduleRouter = [
   {
     path: '/posts',
     route: PostRoutes,
+  },
+  {
+    path: '/favourite',
+    route: FavouriteRoutes,
   },
   {
     path: '/comments',

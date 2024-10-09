@@ -1,5 +1,3 @@
-// directly address korar jonno index.ts name dawa hoise
-// automatic refer
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -16,5 +14,9 @@ export default {
   cloudinary_api_key: process.env.CLOUDINARY_API_KEY,
   cloudinary_api_secret: process.env.CLOUDINARY_API_SECRET,
   email_user: process.env.EMAIL_USER,
-  email_pass: process.env.EMAIL_PASS
+  email_pass: process.env.EMAIL_PASS,
+  payment_url: process.env.PAYMENT_URL,
+  store_id: process.env.STORE_ID,
+  signature_key: process.env.SIGNATURE_KEY,
+  payment_verify_url: process.env.PAYMENT_VERIFY_URL,
 };

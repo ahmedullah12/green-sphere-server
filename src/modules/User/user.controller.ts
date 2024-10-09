@@ -20,7 +20,7 @@ const updateProfile = catchAsync(async (req, res) => {
   const image = req.file?.path;
 
   const updateData = image
-    ? { ...req.body, image }
+    ? { ...req.body, profilePhoto: image }
     : { ...req.body };
 
   const result = await UserService.updateProfile(id, updateData);

@@ -12,10 +12,13 @@ const getUser = async (id: string) => {
   return result;
 };
 
-const updateProfile = async (id: string, payload: Partial<TUser>) => {
+const updateProfile = async (
+  id: string,
+  payload: { name: string; profilePhoto?: string },
+) => {
   const user = await User.findById(id);
-  if(!user){
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, 'User not found');
   }
 
   const result = await User.findByIdAndUpdate(id, payload, { new: true });
@@ -25,6 +28,7 @@ const updateProfile = async (id: string, payload: Partial<TUser>) => {
 
 const followUser = async (payload: TFollowUser) => {
   const { userId, followedUserId } = payload;
+  console.log(payload);
 
   const session = await mongoose.startSession();
 
@@ -59,15 +63,17 @@ const followUser = async (payload: TFollowUser) => {
 
 const unfollowUser = async (payload: TUnfollowUser) => {
   const { userId, followedUserId } = payload;
+  console.log(payload);
 
   const session = await mongoose.startSession();
+
 
   try {
     session.startTransaction();
 
     // Update the followedUser by removing userId from followers array
-    await User.findByIdAndUpdate(
-      followedUserId,
+    const result1 = await User.findByIdAndUpdate(
+       followedUserId,
       { $pull: { followers: userId } },
       { new: true, session },
     );
@@ -78,6 +84,8 @@ const unfollowUser = async (payload: TUnfollowUser) => {
       { $pull: { following: followedUserId } },
       { new: true, session },
     );
+
+    console.log(result, result1);
 
     // Commit the transaction
     await session.commitTransaction();

@@ -25,7 +25,7 @@ const getAllPosts = async (query: Record<string, unknown>) => {
 };
 
 const getSinglePost = async (id: string) => {
-  const result = await Post.findById(id).populate("userId");
+  const result = await Post.findById(id).populate('userId');
 
   return result;
 };
@@ -99,12 +99,13 @@ const downvotePost = async (postId: string, userId: string) => {
   return post;
 };
 
-const getMyPosts = async(userId: string) => {
-  const result = await Post.find({userId}).sort("-createdAt").populate("userId");
+const getMyPosts = async (userId: string) => {
+  const result = await Post.find({ userId })
+    .sort('-createdAt')
+    .populate('userId');
 
   return result;
-}
-
+};
 
 export const PostServices = {
   createPost,

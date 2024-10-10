@@ -12,6 +12,12 @@ const getUser = async (id: string) => {
   return result;
 };
 
+const getAllUser = async () => {
+  const result = await User.find().populate('followers').populate('following');
+
+  return result;
+};
+
 const updateProfile = async (
   id: string,
   payload: { name: string; profilePhoto?: string },
@@ -67,13 +73,12 @@ const unfollowUser = async (payload: TUnfollowUser) => {
 
   const session = await mongoose.startSession();
 
-
   try {
     session.startTransaction();
 
     // Update the followedUser by removing userId from followers array
     const result1 = await User.findByIdAndUpdate(
-       followedUserId,
+      followedUserId,
       { $pull: { followers: userId } },
       { new: true, session },
     );
@@ -102,6 +107,7 @@ const unfollowUser = async (payload: TUnfollowUser) => {
 
 export const UserService = {
   getUser,
+  getAllUser,
   updateProfile,
   followUser,
   unfollowUser,

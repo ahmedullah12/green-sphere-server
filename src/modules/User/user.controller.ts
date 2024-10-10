@@ -15,6 +15,17 @@ const getUser = catchAsync(async (req, res) => {
   });
 });
 
+const getAllUser = catchAsync(async (req, res) => {
+  const result = await UserService.getAllUser();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'All User Data Fetched Successfully!!!',
+    data: result,
+  });
+});
+
 const updateProfile = catchAsync(async (req, res) => {
   const { id } = req.params;
   const image = req.file?.path;
@@ -58,6 +69,7 @@ const unfollowUser = catchAsync(async (req, res) => {
 
 export const UserController = {
   getUser,
+  getAllUser,
   updateProfile,
   followUser,
   unfollowUser,

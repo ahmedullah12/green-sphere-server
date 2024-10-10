@@ -21,6 +21,13 @@ const createPayment = async (payload: string) => {
   return paymentSession;
 };
 
+const getPayments = async () => {
+  const payments = await Payment.find().populate("userID");
+
+  return payments;
+};
+
 export const PaymentCollectionService = {
-    createPayment,
-}
+  createPayment,
+  getPayments,
+};

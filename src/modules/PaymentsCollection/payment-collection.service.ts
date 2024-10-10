@@ -9,6 +9,7 @@ const createPayment = async (payload: string) => {
   const paymentData = {
     transactionId,
     userId: payment.userId,
+    paymentId: payment._id,
     totalAmount: payment?.totalAmount,
     customerName: payment?.name,
     customerEmail: payment?.email,
@@ -22,7 +23,7 @@ const createPayment = async (payload: string) => {
 };
 
 const getPayments = async () => {
-  const payments = await Payment.find().populate("userID");
+  const payments = await Payment.find().populate("userId");
 
   return payments;
 };

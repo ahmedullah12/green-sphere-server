@@ -6,7 +6,11 @@ import { verifyPayment } from './payment.utils';
 import { User } from '../User/user.model';
 import { Payment } from '../PaymentsCollection/payment-collection.model';
 
-const confirmationService = async (transactionId: string, userId: string) => {
+const confirmationService = async (
+  transactionId: string,
+  userId: string,
+  paymentId: string,
+) => {
   const verifyResponse = await verifyPayment(transactionId);
 
   let result;
@@ -19,8 +23,8 @@ const confirmationService = async (transactionId: string, userId: string) => {
       { new: true },
     );
 
-    await Payment.findOneAndUpdate(
-      { userId: userId },
+    await Payment.findByIdAndUpdate(
+      paymentId,
       { isConfirmed: true },
       { new: true },
     );

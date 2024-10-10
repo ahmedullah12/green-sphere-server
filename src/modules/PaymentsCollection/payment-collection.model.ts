@@ -9,6 +9,8 @@ const paymentSchema = new Schema<TPayment>({
   address: { type: String, required: true },
   totalAmount: { type: Number, default: 500, },
   isConfirmed: {type: Boolean, default: false},
+}, {
+  timestamps: true,
 });
 
 export const Payment = model<TPayment>('Payment', paymentSchema);

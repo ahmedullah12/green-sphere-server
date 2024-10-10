@@ -13,7 +13,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:3000",
-      "https://greehsphere.netlify.app"
+      "https://greensphere.netlify.app"
     ],
     credentials: true,
   }),

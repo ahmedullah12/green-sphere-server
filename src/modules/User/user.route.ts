@@ -14,7 +14,9 @@ router.put(
   parseBody,
   UserController.updateProfile,
 );
+router.delete("/:id", auth("ADMIN"), UserController.deleteUser);
 router.put('/follow-user', UserController.followUser);
 router.put('/unfollow-user', UserController.unfollowUser);
+router.put("/make-admin/:id", auth("ADMIN"), UserController.makeAdmin)
 
 export const UserRoutes = router;

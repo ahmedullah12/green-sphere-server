@@ -3,6 +3,7 @@ import { TFollowUser, TUnfollowUser, TUser } from './user.interface';
 import { User } from './user.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
+import { Post } from '../Post/post.model';
 
 const getUser = async (id: string) => {
   const result = await User.findById(id)
@@ -30,6 +31,26 @@ const updateProfile = async (
   const result = await User.findByIdAndUpdate(id, payload, { new: true });
 
   return result;
+};
+
+const deleteUser = async (userId: string) => {
+  const session = await mongoose.startSession();
+  try {
+    session.startTransaction();
+
+    await Post.deleteMany({ userId }, { session });
+
+    const result = await User.findByIdAndDelete(userId, { session });
+
+    await session.commitTransaction();
+    await session.endSession();
+
+    return result;
+  } catch (error: any) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new Error(error.message);
+  }
 };
 
 const followUser = async (payload: TFollowUser) => {
@@ -105,10 +126,18 @@ const unfollowUser = async (payload: TUnfollowUser) => {
   }
 };
 
+const makeAdmin = async(userId: string) => {
+  const result = await User.findByIdAndUpdate(userId, {role: "ADMIN"});
+
+  return result;
+}
+
 export const UserService = {
   getUser,
   getAllUser,
   updateProfile,
+  deleteUser,
   followUser,
   unfollowUser,
+  makeAdmin
 };

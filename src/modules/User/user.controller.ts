@@ -36,12 +36,22 @@ const updateProfile = catchAsync(async (req, res) => {
 
   const result = await UserService.updateProfile(id, updateData);
 
-
-
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: 'User Updated Successfully!!!',
+    data: result,
+  });
+});
+
+const deleteUser = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserService.deleteUser(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'User Deleted Successfully!!!',
     data: result,
   });
 });
@@ -67,10 +77,24 @@ const unfollowUser = catchAsync(async (req, res) => {
   });
 });
 
+const makeAdmin = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const result = await UserService.makeAdmin(id);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Admin Created Successfully!!!',
+    data: result,
+  });
+});
+
 export const UserController = {
   getUser,
   getAllUser,
   updateProfile,
+  deleteUser,
   followUser,
   unfollowUser,
+  makeAdmin
 };

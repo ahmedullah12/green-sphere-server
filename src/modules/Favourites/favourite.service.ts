@@ -9,7 +9,13 @@ const addFavourite = async (payload: TFavourite) => {
 };
 
 const getFavourites = async (userId: string) => {
-  const result = await Favourite.find({ userId }).populate('postId');
+  const result = await Favourite.find({ userId })
+    .populate({
+      path: 'postId',  
+      populate: {
+        path: 'userId',  
+      },
+    })
 
   return result;
 };

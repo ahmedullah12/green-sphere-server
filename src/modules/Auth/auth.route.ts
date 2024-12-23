@@ -22,6 +22,17 @@ router.post(
   validateRequest(AuthValidations.loginValidationSchema),
   AuthController.loginUser,
 );
+
+router.get(
+  '/google/login',
+  AuthController.googleLogin
+);
+
+router.get(
+  '/google/callback',
+  AuthController.googleCallback,
+);
+
 router.post('/refresh-token', AuthController.refreshToken);
 
 router.put(

@@ -6,14 +6,17 @@ export type TUser = {
   _id?: string;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   profilePhoto?: string;
   role: keyof typeof USER_ROLE;
   followers: Types.ObjectId[];
   following: Types.ObjectId[];
   isDeleted: boolean;
   isVerified: boolean;
+  provider?: TAuthProvider;
 };
+
+export type TAuthProvider = "credentials" | "google"
 
 export interface IUserModel extends Model<TUser> {
   isUserExistsByEmail(email: string): Promise<TUser>;

@@ -41,6 +41,23 @@ const loginUser = catchAsync(async (req, res) => {
   });
 });
 
+const googleLogin = catchAsync(async (req, res) => {
+  const result = await AuthServices.getGoogleAuthURL();
+  console.log(result);
+
+  res.redirect(result);
+});
+
+const googleCallback = catchAsync(async (req, res) => {
+  const code = req.query.code as string;
+  const { accessToken, refreshToken } = await AuthServices.googleCallback(code);
+
+  // Redirect to frontend with tokens
+  res.redirect(
+    `http://localhost:3000/auth/success?accessToken=${accessToken}&refreshToken=${refreshToken}`,
+  );
+});
+
 const refreshToken = catchAsync(async (req, res) => {
   const { refreshToken } = req.cookies;
   const result = await AuthServices.refreshToken(refreshToken);
@@ -97,6 +114,8 @@ const resetPassword = catchAsync(async (req, res) => {
 export const AuthController = {
   registerUser,
   loginUser,
+  googleLogin,
+  googleCallback,
   refreshToken,
   changePassword,
   forgetPassword,

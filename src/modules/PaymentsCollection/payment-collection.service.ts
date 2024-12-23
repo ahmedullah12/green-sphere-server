@@ -15,6 +15,7 @@ const createPayment = async (payload: string) => {
     customerEmail: payment?.email,
     customerPhone: payment?.phone,
     customerAddress: payment?.address,
+
   };
 
   const paymentSession = await initiatePayment(paymentData);

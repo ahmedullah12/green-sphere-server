@@ -1,12 +1,14 @@
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
-import { TLoginUser, TRegisterUser } from './auth.interface';
+import { TGoogleUserInfo, TLoginUser, TRegisterUser } from './auth.interface';
 import { createToken } from '../../utils/verifyJwt';
 import { User } from '../User/user.model';
 import config from '../../config';
-import bcrypt from "bcrypt";
+import bcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendEmail } from '../../utils/sendEmail';
+import { OAuth2Client } from 'google-auth-library';
+import { USER_ROLE } from '../User/user.constant';
 
 const registerUser = async (payload: TRegisterUser) => {
   // check if the user already exists
@@ -52,6 +54,13 @@ const loginUser = async (payload: TLoginUser) => {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
   }
 
+  if (user.provider === 'google' || !user.password) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      'Please login with different provider',
+    );
+  }
+
   //checking if the password is correct
   const isPasswordMatched = await User.isPasswordMatched(
     payload?.password,
@@ -88,12 +97,96 @@ const loginUser = async (payload: TLoginUser) => {
   };
 };
 
+const dataobj = {
+  clientId: config.google_client_id as string,
+  clientSecret: config.google_client_secret as string,
+  redirectUri: `${config.server_url}/api/auth/google/callback`,
+}
+console.log(dataobj);
+
+const oauth2Client = new OAuth2Client(dataobj);
+
+// Generate Google OAuth URL
+const getGoogleAuthURL = () => {
+  const scopes = [
+    'https://www.googleapis.com/auth/userinfo.profile',
+    'https://www.googleapis.com/auth/userinfo.email',
+  ];
+
+  return oauth2Client.generateAuthUrl({
+    access_type: 'offline',
+    scope: scopes,
+    include_granted_scopes: true,
+  });
+};
+
+const googleCallback = async (code: string) => {
+  console.log(code);
+  try {
+    // Exchange code for tokens
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Get user info from Google
+    const userInfoClient = oauth2Client.request({
+      url: 'https://www.googleapis.com/oauth2/v3/userinfo',
+    });
+
+    const { data } = (await userInfoClient) as { data: TGoogleUserInfo };
+    console.log(data);
+
+    // Check if user exists
+    let user = await User.isUserExistsByEmail(data.email);
+
+    if (!user) {
+      // Create new user if doesn't exist
+      user = await User.create({
+        name: data.name,
+        email: data.email,
+        profilePhoto: data.picture,
+        provider: 'google',
+        role: USER_ROLE.USER,
+      });
+    }
+
+    const jwtPayload = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      profilePhoto: user.profilePhoto as string,
+      role: user.role,
+    };
+
+    // Generate tokens exactly like email/password login
+    const refreshToken = createToken(
+      jwtPayload,
+      config.refresh_token_secret as string,
+      config.refresh_token_expires_in as string,
+    );
+
+    const accessToken = createToken(
+      jwtPayload,
+      config.access_token_secret as string,
+      config.access_token_expires_in as string,
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
+  } catch (error: any) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      error.message,
+    );
+  }
+};
 
 const refreshToken = async (token: string) => {
   // checking if the given token is valid
   const decoded = jwt.verify(
     token,
-    config.refresh_token_secret as string
+    config.refresh_token_secret as string,
   ) as JwtPayload;
 
   const { email, iat } = decoded;
@@ -104,7 +197,6 @@ const refreshToken = async (token: string) => {
   if (!user) {
     throw new AppError(httpStatus.NOT_FOUND, 'This user is not found!');
   }
-
 
   const jwtPayload = {
     _id: user._id,
@@ -117,14 +209,13 @@ const refreshToken = async (token: string) => {
   const accessToken = createToken(
     jwtPayload,
     config.access_token_secret as string,
-    config.access_token_expires_in as string
+    config.access_token_expires_in as string,
   );
 
   return {
     accessToken,
   };
 };
-
 
 const changePassword = async (
   userId: string,
@@ -138,21 +229,20 @@ const changePassword = async (
   }
 
   //checking if the password is correct
-  if (!(await User.isPasswordMatched(payload.oldPassword, user?.password)))
-    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
+  if (
+    !(await User.isPasswordMatched(
+      payload.oldPassword,
+      user?.password as string,
+    ))
+  )
+    throw new AppError(httpStatus.FORBIDDEN, 'Old password do not matched');
 
   //hash new password
-  const newHashedPassword = await bcrypt.hash(
-    payload.newPassword,
-    12,
-  );
+  const newHashedPassword = await bcrypt.hash(payload.newPassword, 12);
 
-  await User.findByIdAndUpdate(
-    user._id,
-    {
-      password: newHashedPassword,
-    },
-  );
+  await User.findByIdAndUpdate(user._id, {
+    password: newHashedPassword,
+  });
 
   return null;
 };
@@ -202,17 +292,13 @@ const resetPassword = async (
     config.access_token_secret as string,
   ) as JwtPayload;
 
-
   if (payload.email !== decoded.email) {
     console.log(payload.email, decoded.email);
     throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden!');
   }
 
   //hash new password
-  const newHashedPassword = await bcrypt.hash(
-    payload.newPassword,
-    12,
-  );
+  const newHashedPassword = await bcrypt.hash(payload.newPassword, 12);
 
   await User.findOneAndUpdate(
     {
@@ -225,12 +311,13 @@ const resetPassword = async (
   );
 };
 
-
 export const AuthServices = {
-    registerUser,
-    loginUser,
-    refreshToken,
-    changePassword,
-    forgetPassword,
-    resetPassword
-}
+  registerUser,
+  loginUser,
+  getGoogleAuthURL,
+  googleCallback,
+  refreshToken,
+  changePassword,
+  forgetPassword,
+  resetPassword,
+};

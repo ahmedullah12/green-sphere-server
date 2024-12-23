@@ -21,7 +21,6 @@ const userSchema = new Schema<TUser, IUserModel>(
     },
     password: {
       type: String,
-      required: true,
     },
     profilePhoto: {
       type: String,

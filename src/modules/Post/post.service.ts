@@ -6,6 +6,7 @@ import { TPost } from './post.interface';
 import { Post } from './post.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
+import { Group } from '../Group/group.model';
 
 const createPost = async (payload: TPost) => {
   const result = await Post.create(payload);
@@ -107,6 +108,65 @@ const getMyPosts = async (userId: string) => {
   return result;
 };
 
+const getLikedPosts = async (userId: string) => {
+  const result = await Post.find({
+    upvotes: { $in: [new mongoose.Types.ObjectId(userId)] },
+  })
+    .sort('-createdAt')
+    .populate('userId');
+
+  return result;
+};
+
+const createGroupPost = async (
+  payload: TPost,
+  groupId: string,
+  userId: string,
+) => {
+  const group = await Group.findById(groupId);
+
+  if (!group) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Group not found');
+  }
+
+  // Check if user is a member
+  if (!group.members.map((id) => id.toString()).includes(userId)) {
+    throw new AppError(httpStatus.FORBIDDEN, 'Only group members can post');
+  }
+
+  const post = await Post.create({
+    ...payload,
+    userId,
+    groupId,
+  });
+
+  const result = await post.populate(['userId', 'groupId']);
+  return result;
+};
+
+const getGroupPosts = async (
+  groupId: string,
+  query: Record<string, unknown>,
+) => {
+  const group = await Group.findById(groupId);
+
+  if (!group) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Group not found');
+  }
+
+  const postQuery = new QueryBuilder(
+    Post.find({ groupId }).populate(['userId', 'groupId']),
+    query,
+  )
+    .search(postSearchableFields)
+    .sort()
+    .filter()
+    .paginate();
+
+  const result = await postQuery.modelQuery;
+  return result;
+};
+
 export const PostServices = {
   createPost,
   getAllPosts,
@@ -116,4 +176,7 @@ export const PostServices = {
   upvotePost,
   downvotePost,
   getMyPosts,
+  getLikedPosts,
+  createGroupPost,
+  getGroupPosts
 };

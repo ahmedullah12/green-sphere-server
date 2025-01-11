@@ -9,18 +9,20 @@ const router = Router();
 
 router.post(
   '/create-post',
-  multerUpload.single("image"),
+  multerUpload.single('image'),
   parseBody,
   validateRequest(PostValidations.createPostValidationSchema),
   PostController.createPost,
 );
-router.get("/", PostController.getAllPosts);
-router.get("/:id", PostController.getSinglePost);
-router.get("/my-posts/:userId", PostController.getMyPosts);
-router.put("/:id", PostController.updatePost);
-router.delete("/:id", PostController.deletePost);
-router.put("/action/upvote-post", PostController.upvotePost);
-router.put("/action/downvote-post", PostController.downvotePost);
-
+router.get('/', PostController.getAllPosts);
+router.post('/:groupId/posts', PostController.createGroupPost);
+router.get('/:groupId/posts', PostController.getGroupPosts);
+router.get('/:id', PostController.getSinglePost);
+router.get('/my-posts/:userId', PostController.getMyPosts);
+router.get('/liked-posts/:userId', PostController.getLikedPosts);
+router.put('/:id', PostController.updatePost);
+router.delete('/:id', PostController.deletePost);
+router.put('/action/upvote-post', PostController.upvotePost);
+router.put('/action/downvote-post', PostController.downvotePost);
 
 export const PostRoutes = router;

@@ -99,7 +99,6 @@ const downvotePost = catchAsync(async (req, res) => {
   });
 });
 
-
 const getMyPosts = catchAsync(async (req, res) => {
   const { userId } = req.params;
   const result = await PostServices.getMyPosts(userId);
@@ -108,6 +107,50 @@ const getMyPosts = catchAsync(async (req, res) => {
     statusCode: httpStatus.OK,
     success: true,
     message: 'Posts Fetched Successfully!!!',
+    data: result,
+  });
+});
+
+const getLikedPosts = catchAsync(async (req, res) => {
+  const { userId } = req.params;
+
+  const result = await PostServices.getLikedPosts(userId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Liked posts retrieved successfully!!!',
+    data: result,
+  });
+});
+
+const createGroupPost = catchAsync(async (req, res) => {
+  const { groupId } = req.params;
+  const result = await PostServices.createGroupPost(
+    {
+      ...req.body,
+      image: req.file?.path,
+    },
+    groupId,
+    req.user.id
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Group Post Created Successfully!!!',
+    data: result,
+  });
+});
+
+const getGroupPosts = catchAsync(async (req, res) => {
+  const { groupId } = req.params;
+  const result = await PostServices.getGroupPosts(groupId, req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: 'Group Posts Fetched Successfully!!!',
     data: result,
   });
 });
@@ -121,4 +164,7 @@ export const PostController = {
   upvotePost,
   downvotePost,
   getMyPosts,
+  getLikedPosts,
+  createGroupPost,
+  getGroupPosts,
 };

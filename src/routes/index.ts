@@ -6,6 +6,8 @@ import { CommentRoutes } from '../modules/Comment/comment.route';
 import { PaymentCollectionRoutes } from '../modules/PaymentsCollection/payment-collection.route';
 import { PaymentRoutes } from '../modules/Payment/payment.route';
 import { FavouriteRoutes } from '../modules/Favourites/favourite.route';
+import { GroupRoutes } from '../modules/Group/group.route';
+import { OverviewRoutes } from '../modules/OverviewData/overview-data.route';
 
 const router = express.Router();
 
@@ -31,12 +33,20 @@ const moduleRouter = [
     route: CommentRoutes,
   },
   {
-    path: "/payment",
-    route: PaymentRoutes
+    path: '/payment',
+    route: PaymentRoutes,
   },
   {
     path: '/payment-collection',
     route: PaymentCollectionRoutes,
+  },
+  {
+    path: '/groups',
+    route: GroupRoutes,
+  },
+  {
+    path: '/overview',
+    route: OverviewRoutes,
   },
 ];
 

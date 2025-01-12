@@ -157,7 +157,6 @@ const googleCallback = async (code: string) => {
       role: user.role,
     };
 
-    // Generate tokens exactly like email/password login
     const refreshToken = createToken(
       jwtPayload,
       config.refresh_token_secret as string,

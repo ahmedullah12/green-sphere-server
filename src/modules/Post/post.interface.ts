@@ -8,6 +8,7 @@ export type TPost = {
   userId: Types.ObjectId;
   category: (keyof typeof POST_CATEGORY)[];
   tag: keyof typeof POST_TAG;
+  groupId?: Types.ObjectId;
   upvotes: Types.ObjectId[];
   downvotes: Types.ObjectId[];
 };

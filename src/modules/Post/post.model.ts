@@ -41,6 +41,11 @@ const postSchema = new Schema<TPost>(
       ref: 'User',
       default: [],
     },
+    groupId: {
+      type: Schema.Types.ObjectId,
+      ref: "Group",
+      default: null,
+    }
   },
   {
     timestamps: true,

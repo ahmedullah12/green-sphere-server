@@ -15,7 +15,12 @@ router.post(
   PostController.createPost,
 );
 router.get('/', PostController.getAllPosts);
-router.post('/:groupId/posts', PostController.createGroupPost);
+router.post(
+  '/:groupId/posts',
+  multerUpload.single('image'),
+  parseBody,
+  PostController.createGroupPost,
+);
 router.get('/:groupId/posts', PostController.getGroupPosts);
 router.get('/:id', PostController.getSinglePost);
 router.get('/my-posts/:userId', PostController.getMyPosts);

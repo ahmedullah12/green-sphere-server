@@ -2,21 +2,23 @@ import { Router } from 'express';
 import { GroupController } from './group.controller';
 import { multerUpload } from '../../config/multer.config';
 import { parseBody } from '../../middlewares/bodyParser';
+import auth from "../../middlewares/auth"
 
 const router = Router();
 
 router.post(
   '/',
+  auth("USER", "ADMIN"),
   multerUpload.single('avatar'),
   parseBody,
   GroupController.createGroup,
 );
 router.get('/', GroupController.getAllGroups);
-router.get('/my-groups', GroupController.getMyGroups);
+router.get('/my-groups', auth("USER", "ADMIN"), GroupController.getMyGroups);
 router.get('/:groupId', GroupController.getSingleGroup);
-router.post('/:groupId/join', GroupController.joinGroup);
-router.post('/:groupId/leave', GroupController.leaveGroup);
-router.put('/:groupId', GroupController.updateGroup);
-router.delete('/:groupId', GroupController.deleteGroup);
+router.post('/:groupId/join', auth("USER", "ADMIN"), GroupController.joinGroup);
+router.post('/:groupId/leave', auth("USER", "ADMIN"), GroupController.leaveGroup);
+router.put('/:groupId', auth("USER", "ADMIN"), GroupController.updateGroup);
+router.delete('/:groupId',auth("USER", "ADMIN"), GroupController.deleteGroup);
 
 export const GroupRoutes = router;

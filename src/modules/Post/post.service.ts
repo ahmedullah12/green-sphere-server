@@ -121,7 +121,6 @@ const getLikedPosts = async (userId: string) => {
 const createGroupPost = async (
   payload: TPost,
   groupId: string,
-  userId: string,
 ) => {
   const group = await Group.findById(groupId);
 
@@ -129,14 +128,8 @@ const createGroupPost = async (
     throw new AppError(httpStatus.NOT_FOUND, 'Group not found');
   }
 
-  // Check if user is a member
-  if (!group.members.map((id) => id.toString()).includes(userId)) {
-    throw new AppError(httpStatus.FORBIDDEN, 'Only group members can post');
-  }
-
   const post = await Post.create({
     ...payload,
-    userId,
     groupId,
   });
 

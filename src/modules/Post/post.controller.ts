@@ -132,7 +132,6 @@ const createGroupPost = catchAsync(async (req, res) => {
       image: req.file?.path,
     },
     groupId,
-    req.user.id
   );
 
   sendResponse(res, {

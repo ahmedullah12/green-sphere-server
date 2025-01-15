@@ -4,6 +4,7 @@ import { catchAsync } from '../../utils/catchAsync';
 import sendResponse from '../../utils/sendResponse';
 import { PostServices } from './post.service';
 import mongoose from 'mongoose';
+import { io } from '../../server';
 
 const createPost = catchAsync(async (req, res) => {
   const result = await PostServices.createPost({
@@ -45,7 +46,6 @@ const getSinglePost = catchAsync(async (req, res) => {
 const updatePost = catchAsync(async (req, res) => {
   const { id } = req.params;
   const result = await PostServices.updatePost(id, req.body);
-  console.log(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -73,6 +73,7 @@ const upvotePost = catchAsync(async (req, res) => {
   const result = await PostServices.upvotePost(
     postId as string,
     userId as string,
+    io,
   );
 
   sendResponse(res, {
@@ -89,6 +90,7 @@ const downvotePost = catchAsync(async (req, res) => {
   const result = await PostServices.downvotePost(
     postId as string,
     userId as string,
+    io,
   );
 
   sendResponse(res, {

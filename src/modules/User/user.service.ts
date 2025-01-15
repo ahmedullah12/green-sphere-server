@@ -55,7 +55,6 @@ const deleteUser = async (userId: string) => {
 
 const followUser = async (payload: TFollowUser) => {
   const { userId, followedUserId } = payload;
-  console.log(payload);
 
   const session = await mongoose.startSession();
 
@@ -90,7 +89,6 @@ const followUser = async (payload: TFollowUser) => {
 
 const unfollowUser = async (payload: TUnfollowUser) => {
   const { userId, followedUserId } = payload;
-  console.log(payload);
 
   const session = await mongoose.startSession();
 
@@ -110,8 +108,6 @@ const unfollowUser = async (payload: TUnfollowUser) => {
       { $pull: { following: followedUserId } },
       { new: true, session },
     );
-
-    console.log(result, result1);
 
     // Commit the transaction
     await session.commitTransaction();

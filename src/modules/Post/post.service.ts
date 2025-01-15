@@ -7,6 +7,8 @@ import { Post } from './post.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { Group } from '../Group/group.model';
+import NotificationService from '../Notification/notification.service';
+import { Server } from 'socket.io';
 
 const createPost = async (payload: TPost) => {
   const result = await Post.create(payload);
@@ -43,8 +45,9 @@ const deletePost = async (id: string) => {
   return result;
 };
 
-const upvotePost = async (postId: string, userId: string) => {
-  const post = await Post.findById(postId);
+const upvotePost = async (postId: string, userId: string, io: Server) => {
+  const post = await Post.findById(postId).populate('userId');
+  const notificationService = new NotificationService(io);
 
   if (!post) {
     throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
@@ -55,25 +58,49 @@ const upvotePost = async (postId: string, userId: string) => {
     .includes(userId);
 
   if (isDownvoted) {
+    // Remove downvote
     post.downvotes = post.downvotes.filter((id) => id.toString() !== userId);
+    // Delete downvote notification
+    await notificationService.deleteNotification({
+      recipient: post.userId._id.toString(),
+      sender: userId,
+      type: 'downvote',
+      post: postId,
+    });
   } else {
     const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
 
     if (isUpvoted) {
+      // Remove upvote
       post.upvotes = post.upvotes.filter((id) => id.toString() !== userId);
+      // Delete upvote notification
+      await notificationService.deleteNotification({
+        recipient: post.userId._id.toString(),
+        sender: userId,
+        type: 'upvote',
+        post: postId,
+      });
     } else {
+      // Add upvote
       const userObjectId = new mongoose.Types.ObjectId(userId);
       post.upvotes.push(userObjectId);
+      // Create upvote notification
+      await notificationService.createNotification({
+        recipient: post.userId._id.toString(),
+        sender: userId,
+        type: 'upvote',
+        post: postId,
+      });
     }
   }
 
   const result = await post.save();
-
   return result;
 };
 
-const downvotePost = async (postId: string, userId: string) => {
-  const post = await Post.findById(postId);
+const downvotePost = async (postId: string, userId: string, io: Server) => {
+  const post = await Post.findById(postId).populate('userId');
+  const notificationService = new NotificationService(io);
 
   if (!post) {
     throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
@@ -81,23 +108,46 @@ const downvotePost = async (postId: string, userId: string) => {
 
   const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
   if (isUpvoted) {
+    // Remove upvote
     post.upvotes = post.upvotes.filter((id) => id.toString() !== userId);
+    // Delete upvote notification
+    await notificationService.deleteNotification({
+      recipient: post.userId._id.toString(),
+      sender: userId,
+      type: 'upvote',
+      post: postId,
+    });
   } else {
     const isDownvoted = post.downvotes
       .map((id) => id.toString())
       .includes(userId);
 
     if (isDownvoted) {
+      // Remove downvote
       post.downvotes = post.downvotes.filter((id) => id.toString() !== userId);
+      // Delete downvote notification
+      await notificationService.deleteNotification({
+        recipient: post.userId._id.toString(),
+        sender: userId,
+        type: 'downvote',
+        post: postId,
+      });
     } else {
+      // Add downvote
       const userObjectId = new mongoose.Types.ObjectId(userId);
       post.downvotes.push(userObjectId);
+      // Create downvote notification
+      await notificationService.createNotification({
+        recipient: post.userId._id.toString(),
+        sender: userId,
+        type: 'downvote',
+        post: postId,
+      });
     }
   }
 
-  await post.save();
-
-  return post;
+  const result = await post.save();
+  return result;
 };
 
 const getMyPosts = async (userId: string) => {
@@ -118,10 +168,7 @@ const getLikedPosts = async (userId: string) => {
   return result;
 };
 
-const createGroupPost = async (
-  payload: TPost,
-  groupId: string,
-) => {
+const createGroupPost = async (payload: TPost, groupId: string) => {
   const group = await Group.findById(groupId);
 
   if (!group) {
@@ -171,5 +218,5 @@ export const PostServices = {
   getMyPosts,
   getLikedPosts,
   createGroupPost,
-  getGroupPosts
+  getGroupPosts,
 };

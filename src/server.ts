@@ -2,8 +2,10 @@ import mongoose from 'mongoose';
 import app from './app';
 import config from './config';
 import { Server } from 'http';
+import { Server as SocketIoServer } from 'socket.io';
 
 let server: Server;
+let io: SocketIoServer;
 
 async function main() {
   try {
@@ -12,10 +14,32 @@ async function main() {
     server = app.listen(config.port, () => {
       console.log(`Server running on  ${config.port}`);
     });
+
+    io = new SocketIoServer(server, {
+      cors: {
+        origin: ['http://localhost:3000', 'https://greensphere.netlify.app'],
+        credentials: true,
+      },
+    });
+
+    io.on('connection', (socket) => {
+      console.log(`User connected ${socket.id}`);
+
+      // Join a room with the user's ID for private notifications
+      socket.on('join', (userId: string) => {
+        socket.join(userId);
+      });
+
+      socket.on('disconnect', () => {
+        console.log(`User disconnected ${socket.id}`);
+      });
+    });
   } catch (err) {
     console.log(err);
   }
 }
+
+export { io };
 
 main();
 

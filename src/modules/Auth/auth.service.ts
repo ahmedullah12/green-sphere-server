@@ -102,7 +102,6 @@ const dataobj = {
   clientSecret: config.google_client_secret as string,
   redirectUri: `${config.server_url}/api/auth/google/callback`,
 }
-console.log(dataobj);
 
 const oauth2Client = new OAuth2Client(dataobj);
 
@@ -121,7 +120,6 @@ const getGoogleAuthURL = () => {
 };
 
 const googleCallback = async (code: string) => {
-  console.log(code);
   try {
     // Exchange code for tokens
     const { tokens } = await oauth2Client.getToken(code);
@@ -133,7 +131,6 @@ const googleCallback = async (code: string) => {
     });
 
     const { data } = (await userInfoClient) as { data: TGoogleUserInfo };
-    console.log(data);
 
     // Check if user exists
     let user = await User.isUserExistsByEmail(data.email);
@@ -271,8 +268,6 @@ const forgetPassword = async (userEmail: string) => {
   const resetUILink = `${config.reset_pass_ui_link}?id=${user._id}&token=${resetToken} `;
 
   await sendEmail(user.email, resetUILink);
-
-  console.log(resetUILink);
 };
 
 const resetPassword = async (
@@ -292,7 +287,6 @@ const resetPassword = async (
   ) as JwtPayload;
 
   if (payload.email !== decoded.email) {
-    console.log(payload.email, decoded.email);
     throw new AppError(httpStatus.FORBIDDEN, 'You are forbidden!');
   }
 

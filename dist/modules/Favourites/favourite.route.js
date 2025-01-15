@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.FavouriteRoutes = void 0;
+const express_1 = require("express");
+const favourite_controller_1 = require("./favourite.controller");
+const router = (0, express_1.Router)();
+router.post('/', favourite_controller_1.FavouriteController.addFavourite);
+router.get('/:id', favourite_controller_1.FavouriteController.getFavourites);
+router.delete('/:id', favourite_controller_1.FavouriteController.removeFavourite);
+exports.FavouriteRoutes = router;

@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.UserRoutes = void 0;
+const express_1 = require("express");
+const user_controller_1 = require("./user.controller");
+const multer_config_1 = require("../../config/multer.config");
+const bodyParser_1 = require("../../middlewares/bodyParser");
+const auth_1 = __importDefault(require("../../middlewares/auth"));
+const router = (0, express_1.Router)();
+router.get('/', (0, auth_1.default)('ADMIN'), user_controller_1.UserController.getAllUser);
+router.get('/:id', user_controller_1.UserController.getUser);
+router.put('/update-profile/:id', multer_config_1.multerUpload.single('image'), bodyParser_1.parseBody, user_controller_1.UserController.updateProfile);
+router.delete("/:id", (0, auth_1.default)("ADMIN"), user_controller_1.UserController.deleteUser);
+router.put('/follow-user', user_controller_1.UserController.followUser);
+router.put('/unfollow-user', user_controller_1.UserController.unfollowUser);
+router.put("/make-admin/:id", (0, auth_1.default)("ADMIN"), user_controller_1.UserController.makeAdmin);
+exports.UserRoutes = router;

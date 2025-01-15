@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AuthRoutes = void 0;
+const express_1 = __importDefault(require("express"));
+const auth_validation_1 = require("./auth.validation");
+const auth_controller_1 = require("./auth.controller");
+const validateRequest_1 = require("../../middlewares/validateRequest");
+const multer_config_1 = require("../../config/multer.config");
+const image_validation_1 = require("../../zod/image.validation");
+const bodyParser_1 = require("../../middlewares/bodyParser");
+const validateImageFileRequest_1 = require("../../middlewares/validateImageFileRequest");
+const router = express_1.default.Router();
+router.post('/register', multer_config_1.multerUpload.single('image'), (0, validateImageFileRequest_1.validateSingleImageFileRequest)(image_validation_1.ImageFileZodSchema), bodyParser_1.parseBody, (0, validateRequest_1.validateRequest)(auth_validation_1.AuthValidations.registerValidationSchema), auth_controller_1.AuthController.registerUser);
+router.post('/login', (0, validateRequest_1.validateRequest)(auth_validation_1.AuthValidations.loginValidationSchema), auth_controller_1.AuthController.loginUser);
+router.get('/google/login', auth_controller_1.AuthController.googleLogin);
+router.get('/google/callback', auth_controller_1.AuthController.googleCallback);
+router.post('/refresh-token', auth_controller_1.AuthController.refreshToken);
+router.put('/change-password/:userId', (0, validateRequest_1.validateRequest)(auth_validation_1.AuthValidations.changePasswordValidationSchema), auth_controller_1.AuthController.changePassword);
+router.post('/forget-password', (0, validateRequest_1.validateRequest)(auth_validation_1.AuthValidations.forgetPasswordValidationSchema), auth_controller_1.AuthController.forgetPassword);
+router.post('/reset-password', (0, validateRequest_1.validateRequest)(auth_validation_1.AuthValidations.forgetPasswordValidationSchema), auth_controller_1.AuthController.resetPassword);
+exports.AuthRoutes = router;

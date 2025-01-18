@@ -46,9 +46,8 @@ const deletePost = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield post_model_1.Post.findByIdAndDelete(id);
     return result;
 });
-const upvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, function* () {
+const upvotePost = (postId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const post = yield post_model_1.Post.findById(postId).populate('userId');
-    const notificationService = new notification_service_1.default(io);
     if (!post) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'Post not found');
     }
@@ -56,10 +55,8 @@ const upvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, fun
         .map((id) => id.toString())
         .includes(userId);
     if (isDownvoted) {
-        // Remove downvote
         post.downvotes = post.downvotes.filter((id) => id.toString() !== userId);
-        // Delete downvote notification
-        yield notificationService.deleteNotification({
+        yield notification_service_1.default.deleteNotification({
             recipient: post.userId._id.toString(),
             sender: userId,
             type: 'downvote',
@@ -69,10 +66,8 @@ const upvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, fun
     else {
         const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
         if (isUpvoted) {
-            // Remove upvote
             post.upvotes = post.upvotes.filter((id) => id.toString() !== userId);
-            // Delete upvote notification
-            yield notificationService.deleteNotification({
+            yield notification_service_1.default.deleteNotification({
                 recipient: post.userId._id.toString(),
                 sender: userId,
                 type: 'upvote',
@@ -80,11 +75,9 @@ const upvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, fun
             });
         }
         else {
-            // Add upvote
             const userObjectId = new mongoose_1.default.Types.ObjectId(userId);
             post.upvotes.push(userObjectId);
-            // Create upvote notification
-            yield notificationService.createNotification({
+            yield notification_service_1.default.createNotification({
                 recipient: post.userId._id.toString(),
                 sender: userId,
                 type: 'upvote',
@@ -95,18 +88,15 @@ const upvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, fun
     const result = yield post.save();
     return result;
 });
-const downvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, function* () {
+const downvotePost = (postId, userId) => __awaiter(void 0, void 0, void 0, function* () {
     const post = yield post_model_1.Post.findById(postId).populate('userId');
-    const notificationService = new notification_service_1.default(io);
     if (!post) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'Post not found');
     }
     const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
     if (isUpvoted) {
-        // Remove upvote
         post.upvotes = post.upvotes.filter((id) => id.toString() !== userId);
-        // Delete upvote notification
-        yield notificationService.deleteNotification({
+        yield notification_service_1.default.deleteNotification({
             recipient: post.userId._id.toString(),
             sender: userId,
             type: 'upvote',
@@ -118,10 +108,8 @@ const downvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, f
             .map((id) => id.toString())
             .includes(userId);
         if (isDownvoted) {
-            // Remove downvote
             post.downvotes = post.downvotes.filter((id) => id.toString() !== userId);
-            // Delete downvote notification
-            yield notificationService.deleteNotification({
+            yield notification_service_1.default.deleteNotification({
                 recipient: post.userId._id.toString(),
                 sender: userId,
                 type: 'downvote',
@@ -129,11 +117,9 @@ const downvotePost = (postId, userId, io) => __awaiter(void 0, void 0, void 0, f
             });
         }
         else {
-            // Add downvote
             const userObjectId = new mongoose_1.default.Types.ObjectId(userId);
             post.downvotes.push(userObjectId);
-            // Create downvote notification
-            yield notificationService.createNotification({
+            yield notification_service_1.default.createNotification({
                 recipient: post.userId._id.toString(),
                 sender: userId,
                 type: 'downvote',

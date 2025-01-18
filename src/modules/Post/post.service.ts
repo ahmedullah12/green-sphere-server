@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { TImageFiles } from '../../interface/image.type';
 import { postSearchableFields } from './post.constant';
 import { TPost } from './post.interface';
 import { Post } from './post.model';
@@ -8,7 +7,6 @@ import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { Group } from '../Group/group.model';
 import NotificationService from '../Notification/notification.service';
-import { Server } from 'socket.io';
 
 const createPost = async (payload: TPost) => {
   const result = await Post.create(payload);
@@ -45,9 +43,8 @@ const deletePost = async (id: string) => {
   return result;
 };
 
-const upvotePost = async (postId: string, userId: string, io: Server) => {
+const upvotePost = async (postId: string, userId: string) => {
   const post = await Post.findById(postId).populate('userId');
-  const notificationService = new NotificationService(io);
 
   if (!post) {
     throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
@@ -58,10 +55,9 @@ const upvotePost = async (postId: string, userId: string, io: Server) => {
     .includes(userId);
 
   if (isDownvoted) {
-    // Remove downvote
     post.downvotes = post.downvotes.filter((id) => id.toString() !== userId);
-    // Delete downvote notification
-    await notificationService.deleteNotification({
+
+    await NotificationService.deleteNotification({
       recipient: post.userId._id.toString(),
       sender: userId,
       type: 'downvote',
@@ -71,21 +67,19 @@ const upvotePost = async (postId: string, userId: string, io: Server) => {
     const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
 
     if (isUpvoted) {
-      // Remove upvote
       post.upvotes = post.upvotes.filter((id) => id.toString() !== userId);
-      // Delete upvote notification
-      await notificationService.deleteNotification({
+
+      await NotificationService.deleteNotification({
         recipient: post.userId._id.toString(),
         sender: userId,
         type: 'upvote',
         post: postId,
       });
     } else {
-      // Add upvote
       const userObjectId = new mongoose.Types.ObjectId(userId);
       post.upvotes.push(userObjectId);
-      // Create upvote notification
-      await notificationService.createNotification({
+
+      await NotificationService.createNotification({
         recipient: post.userId._id.toString(),
         sender: userId,
         type: 'upvote',
@@ -98,9 +92,8 @@ const upvotePost = async (postId: string, userId: string, io: Server) => {
   return result;
 };
 
-const downvotePost = async (postId: string, userId: string, io: Server) => {
+const downvotePost = async (postId: string, userId: string) => {
   const post = await Post.findById(postId).populate('userId');
-  const notificationService = new NotificationService(io);
 
   if (!post) {
     throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
@@ -108,10 +101,9 @@ const downvotePost = async (postId: string, userId: string, io: Server) => {
 
   const isUpvoted = post.upvotes.map((id) => id.toString()).includes(userId);
   if (isUpvoted) {
-    // Remove upvote
     post.upvotes = post.upvotes.filter((id) => id.toString() !== userId);
-    // Delete upvote notification
-    await notificationService.deleteNotification({
+
+    await NotificationService.deleteNotification({
       recipient: post.userId._id.toString(),
       sender: userId,
       type: 'upvote',
@@ -123,21 +115,19 @@ const downvotePost = async (postId: string, userId: string, io: Server) => {
       .includes(userId);
 
     if (isDownvoted) {
-      // Remove downvote
       post.downvotes = post.downvotes.filter((id) => id.toString() !== userId);
-      // Delete downvote notification
-      await notificationService.deleteNotification({
+
+      await NotificationService.deleteNotification({
         recipient: post.userId._id.toString(),
         sender: userId,
         type: 'downvote',
         post: postId,
       });
     } else {
-      // Add downvote
       const userObjectId = new mongoose.Types.ObjectId(userId);
       post.downvotes.push(userObjectId);
-      // Create downvote notification
-      await notificationService.createNotification({
+
+      await NotificationService.createNotification({
         recipient: post.userId._id.toString(),
         sender: userId,
         type: 'downvote',

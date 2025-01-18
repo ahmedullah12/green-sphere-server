@@ -17,7 +17,6 @@ const http_status_1 = __importDefault(require("http-status"));
 const catchAsync_1 = require("../../utils/catchAsync");
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const post_service_1 = require("./post.service");
-const server_1 = require("../../server");
 const createPost = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const result = yield post_service_1.PostServices.createPost(Object.assign(Object.assign({}, req.body), { image: (_a = req.file) === null || _a === void 0 ? void 0 : _a.path }));
@@ -69,7 +68,7 @@ const deletePost = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
 }));
 const upvotePost = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId, userId } = req.query;
-    const result = yield post_service_1.PostServices.upvotePost(postId, userId, server_1.io);
+    const result = yield post_service_1.PostServices.upvotePost(postId, userId);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,
@@ -79,7 +78,7 @@ const upvotePost = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, 
 }));
 const downvotePost = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId, userId } = req.query;
-    const result = yield post_service_1.PostServices.downvotePost(postId, userId, server_1.io);
+    const result = yield post_service_1.PostServices.downvotePost(postId, userId);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

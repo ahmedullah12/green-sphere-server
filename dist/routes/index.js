@@ -13,6 +13,7 @@ const payment_route_1 = require("../modules/Payment/payment.route");
 const favourite_route_1 = require("../modules/Favourites/favourite.route");
 const group_route_1 = require("../modules/Group/group.route");
 const overview_data_route_1 = require("../modules/OverviewData/overview-data.route");
+const notification_route_1 = require("../modules/Notification/notification.route");
 const router = express_1.default.Router();
 const moduleRouter = [
     {
@@ -50,6 +51,10 @@ const moduleRouter = [
     {
         path: '/overview',
         route: overview_data_route_1.OverviewRoutes,
+    },
+    {
+        path: '/notifications',
+        route: notification_route_1.NotificationRoutes,
     },
 ];
 moduleRouter.forEach((route) => router.use(route.path, route.route));

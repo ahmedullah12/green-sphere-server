@@ -1,13 +1,9 @@
+// notification.service.ts
+import { JwtPayload } from 'jsonwebtoken';
 import { Notification } from './notification.model';
-import { Server } from 'socket.io';
+import { io } from '../../server';
 
-class NotificationService {
-  private io: Server;
-
-  constructor(io: Server) {
-    this.io = io;
-  }
-
+const NotificationService = {
   async createNotification(data: {
     recipient: string;
     sender: string;
@@ -18,10 +14,10 @@ class NotificationService {
     await notification.populate(['recipient', 'sender', 'post']);
     
     // Emit to specific recipient
-    this.io.to(data.recipient).emit('notification', notification);
+    io.to(data.recipient).emit('notification', notification);
     
     return notification;
-  }
+  },
 
   async deleteNotification(query: {
     recipient: string;
@@ -32,10 +28,20 @@ class NotificationService {
     const notification = await Notification.findOneAndDelete(query);
     
     if (notification) {
-      this.io.to(query.recipient).emit('deleteNotification', notification._id);
+      io.to(query.recipient).emit('deleteNotification', notification._id);
     }
     
     return notification;
+  },
+
+  async getNotifications(userId: string) {
+    const notifications = await Notification.find({
+      recipient: userId
+    })
+    .sort({ createdAt: -1 })  // Sort by newest first
+    .populate(['recipient', 'sender', 'post']);
+
+    return notifications;
   }
 };
 

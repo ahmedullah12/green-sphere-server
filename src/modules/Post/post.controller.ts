@@ -73,7 +73,6 @@ const upvotePost = catchAsync(async (req, res) => {
   const result = await PostServices.upvotePost(
     postId as string,
     userId as string,
-    io,
   );
 
   sendResponse(res, {
@@ -90,7 +89,6 @@ const downvotePost = catchAsync(async (req, res) => {
   const result = await PostServices.downvotePost(
     postId as string,
     userId as string,
-    io,
   );
 
   sendResponse(res, {

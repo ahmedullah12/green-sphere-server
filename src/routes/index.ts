@@ -8,6 +8,7 @@ import { PaymentRoutes } from '../modules/Payment/payment.route';
 import { FavouriteRoutes } from '../modules/Favourites/favourite.route';
 import { GroupRoutes } from '../modules/Group/group.route';
 import { OverviewRoutes } from '../modules/OverviewData/overview-data.route';
+import { NotificationRoutes } from '../modules/Notification/notification.route';
 
 const router = express.Router();
 
@@ -47,6 +48,10 @@ const moduleRouter = [
   {
     path: '/overview',
     route: OverviewRoutes,
+  },
+  {
+    path: '/notifications',
+    route: NotificationRoutes,
   },
 ];
 

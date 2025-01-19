@@ -4,6 +4,7 @@ import { User } from './user.model';
 import AppError from '../../errors/AppError';
 import httpStatus from 'http-status';
 import { Post } from '../Post/post.model';
+import NotificationService from '../Notification/notification.service';
 
 const getUser = async (id: string) => {
   const result = await User.findById(id)
@@ -75,6 +76,12 @@ const followUser = async (payload: TFollowUser) => {
       { new: true, session },
     );
 
+    await NotificationService.createNotification({
+      recipient: followedUserId.toString(),
+      sender: userId.toString(),
+      type: 'follow',
+    });
+
     // Commit the transaction
     await session.commitTransaction();
     await session.endSession();
@@ -96,7 +103,7 @@ const unfollowUser = async (payload: TUnfollowUser) => {
     session.startTransaction();
 
     // Update the followedUser by removing userId from followers array
-    const result1 = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       followedUserId,
       { $pull: { followers: userId } },
       { new: true, session },
@@ -108,6 +115,12 @@ const unfollowUser = async (payload: TUnfollowUser) => {
       { $pull: { following: followedUserId } },
       { new: true, session },
     );
+
+    await NotificationService.deleteNotification({
+      recipient: followedUserId.toString(),
+      sender: userId.toString(),
+      type: 'unfollow',
+    });
 
     // Commit the transaction
     await session.commitTransaction();
@@ -122,11 +135,11 @@ const unfollowUser = async (payload: TUnfollowUser) => {
   }
 };
 
-const makeAdmin = async(userId: string) => {
-  const result = await User.findByIdAndUpdate(userId, {role: "ADMIN"});
+const makeAdmin = async (userId: string) => {
+  const result = await User.findByIdAndUpdate(userId, { role: 'ADMIN' });
 
   return result;
-}
+};
 
 export const UserService = {
   getUser,
@@ -135,5 +148,5 @@ export const UserService = {
   deleteUser,
   followUser,
   unfollowUser,
-  makeAdmin
+  makeAdmin,
 };

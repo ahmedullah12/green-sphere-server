@@ -18,6 +18,7 @@ const user_model_1 = require("./user.model");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
 const post_model_1 = require("../Post/post.model");
+const notification_service_1 = __importDefault(require("../Notification/notification.service"));
 const getUser = (id) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield user_model_1.User.findById(id)
         .populate('followers')
@@ -61,6 +62,11 @@ const followUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
         yield user_model_1.User.findByIdAndUpdate(followedUserId, { $addToSet: { followers: userId } }, { new: true, session });
         // Update the user
         const result = yield user_model_1.User.findByIdAndUpdate(userId, { $addToSet: { following: followedUserId } }, { new: true, session });
+        yield notification_service_1.default.createNotification({
+            recipient: followedUserId.toString(),
+            sender: userId.toString(),
+            type: 'follow',
+        });
         // Commit the transaction
         yield session.commitTransaction();
         yield session.endSession();
@@ -78,9 +84,14 @@ const unfollowUser = (payload) => __awaiter(void 0, void 0, void 0, function* ()
     try {
         session.startTransaction();
         // Update the followedUser by removing userId from followers array
-        const result1 = yield user_model_1.User.findByIdAndUpdate(followedUserId, { $pull: { followers: userId } }, { new: true, session });
+        yield user_model_1.User.findByIdAndUpdate(followedUserId, { $pull: { followers: userId } }, { new: true, session });
         // Update the user by removing followedUserId from following array
         const result = yield user_model_1.User.findByIdAndUpdate(userId, { $pull: { following: followedUserId } }, { new: true, session });
+        yield notification_service_1.default.deleteNotification({
+            recipient: followedUserId.toString(),
+            sender: userId.toString(),
+            type: 'unfollow',
+        });
         // Commit the transaction
         yield session.commitTransaction();
         yield session.endSession();
@@ -94,7 +105,7 @@ const unfollowUser = (payload) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 const makeAdmin = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.User.findByIdAndUpdate(userId, { role: "ADMIN" });
+    const result = yield user_model_1.User.findByIdAndUpdate(userId, { role: 'ADMIN' });
     return result;
 });
 exports.UserService = {
@@ -104,5 +115,5 @@ exports.UserService = {
     deleteUser,
     followUser,
     unfollowUser,
-    makeAdmin
+    makeAdmin,
 };

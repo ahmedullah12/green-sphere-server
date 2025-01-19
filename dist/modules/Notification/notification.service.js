@@ -15,7 +15,7 @@ const NotificationService = {
     createNotification(data) {
         return __awaiter(this, void 0, void 0, function* () {
             const notification = yield notification_model_1.Notification.create(data);
-            yield notification.populate(['recipient', 'sender', 'post']);
+            yield notification.populate(['recipient', 'sender', 'post', 'comment']);
             // Emit to specific recipient
             server_1.io.to(data.recipient).emit('notification', notification);
             return notification;
@@ -24,6 +24,8 @@ const NotificationService = {
     deleteNotification(query) {
         return __awaiter(this, void 0, void 0, function* () {
             const notification = yield notification_model_1.Notification.findOneAndDelete(query);
+            if (!query.recipient)
+                return null;
             if (notification) {
                 server_1.io.to(query.recipient).emit('deleteNotification', notification._id);
             }
@@ -33,12 +35,12 @@ const NotificationService = {
     getNotifications(userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const notifications = yield notification_model_1.Notification.find({
-                recipient: userId
+                recipient: userId,
             })
                 .sort({ createdAt: -1 }) // Sort by newest first
-                .populate(['recipient', 'sender', 'post']);
+                .populate(['recipient', 'sender', 'post', 'comment']);
             return notifications;
         });
-    }
+    },
 };
 exports.default = NotificationService;

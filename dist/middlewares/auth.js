@@ -21,11 +21,13 @@ const verifyJwt_1 = require("../utils/verifyJwt");
 const auth = (...requiredRoles) => {
     return (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
         const token = req.headers.authorization;
+        console.log(token);
         // checking if the token is missing
         if (!token) {
             throw new AppError_1.default(http_status_1.default.UNAUTHORIZED, 'You are not authorized!');
         }
         const decoded = (0, verifyJwt_1.verifyToken)(token, config_1.default.access_token_secret);
+        console.log(decoded);
         const { role, email, iat } = decoded;
         // checking if the user is exist
         const user = yield user_model_1.User.isUserExistsByEmail(email);

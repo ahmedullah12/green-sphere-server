@@ -25,6 +25,13 @@ const notificationSchema = new mongoose_1.Schema({
             return ['upvote', 'downvote', 'comment'].includes(this.type);
         },
     },
+    comment: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'Comment',
+        required: function () {
+            return this.type === 'comment';
+        },
+    },
     read: {
         type: Boolean,
         default: false,

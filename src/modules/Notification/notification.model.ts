@@ -25,6 +25,13 @@ const notificationSchema = new Schema<INotification>(
         return ['upvote', 'downvote', 'comment'].includes(this.type);
       },
     },
+    comment: {
+      type: Schema.Types.ObjectId,
+      ref: 'Comment',
+      required: function () {
+        return this.type === 'comment';
+      },
+    },
     read: {
       type: Boolean,
       default: false,

@@ -44,14 +44,20 @@ const updateComments = (commentId, comment) => __awaiter(void 0, void 0, void 0,
     return result;
 });
 const deleteComments = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const comment = yield comment_model_1.Comment.findById(id);
+    const comment = yield comment_model_1.Comment.findById(id).populate('postId');
     if (!comment) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'Comment not found');
     }
+    const commentedPost = yield post_model_1.Post.findById(comment.postId);
+    if (!commentedPost) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, 'Post not found');
+    }
     // Delete notification for this comment
     yield notification_service_1.default.deleteNotification({
+        recipient: commentedPost.userId.toString(),
+        sender: comment.userId.toString(),
         comment: id.toString(),
-        type: 'comment'
+        type: 'comment',
     });
     const result = yield comment_model_1.Comment.findByIdAndDelete(id);
     return result;

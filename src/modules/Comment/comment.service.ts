@@ -42,17 +42,25 @@ const updateComments = async (
   return result;
 };
 
-const deleteComments = async(id: string) => {
-  const comment = await Comment.findById(id);
-  
+const deleteComments = async (id: string) => {
+  const comment = await Comment.findById(id).populate('postId');
+
   if (!comment) {
     throw new AppError(httpStatus.NOT_FOUND, 'Comment not found');
   }
 
+  const commentedPost = await Post.findById(comment.postId);
+
+  if (!commentedPost) {
+    throw new AppError(httpStatus.NOT_FOUND, 'Post not found');
+  }
+
   // Delete notification for this comment
   await NotificationService.deleteNotification({
+    recipient: commentedPost.userId.toString(),
+    sender: comment.userId.toString(),
     comment: id.toString(),
-    type: 'comment'
+    type: 'comment',
   });
 
   const result = await Comment.findByIdAndDelete(id);

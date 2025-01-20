@@ -42,5 +42,19 @@ const NotificationService = {
             return notifications;
         });
     },
+    markAllAsRead(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield notification_model_1.Notification.updateMany({
+                recipient: userId,
+                read: false
+            }, {
+                $set: { read: true }
+            });
+            if (result.modifiedCount > 0) {
+                server_1.io.to(userId).emit('notificationsMarkedRead');
+            }
+            return result;
+        });
+    },
 };
 exports.default = NotificationService;

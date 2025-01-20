@@ -27,6 +27,16 @@ const getNotifications = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(vo
         data: result,
     });
 }));
+const markAllAsRead = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield notification_service_1.default.markAllAsRead(req.user._id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: 'All notifications marked as read successfully',
+        data: result,
+    });
+}));
 exports.NotificationController = {
-    getNotifications
+    getNotifications,
+    markAllAsRead
 };

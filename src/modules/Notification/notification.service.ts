@@ -47,6 +47,24 @@ const NotificationService = {
 
     return notifications;
   },
+
+  async markAllAsRead(userId: string) {
+    const result = await Notification.updateMany(
+      { 
+        recipient: userId,
+        read: false 
+      },
+      { 
+        $set: { read: true } 
+      }
+    );
+
+    if (result.modifiedCount > 0) {
+      io.to(userId).emit('notificationsMarkedRead');
+    }
+
+    return result;
+  },
 };
 
 export default NotificationService;

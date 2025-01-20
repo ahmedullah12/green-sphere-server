@@ -16,6 +16,7 @@ const getNotifications = catchAsync(async (req, res) => {
 });
 
 const markAllAsRead = catchAsync(async (req, res) => {
+  console.log(req.user);
   const result = await NotificationService.markAllAsRead(req.user._id);
 
   sendResponse(res, {

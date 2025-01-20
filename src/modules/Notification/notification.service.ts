@@ -1,7 +1,6 @@
 // notification.service.ts
-import { JwtPayload } from 'jsonwebtoken';
-import { Notification } from './notification.model';
 import { io } from '../../server';
+import { Notification } from './notification.model';
 
 const NotificationService = {
   async createNotification(data: {
@@ -58,6 +57,8 @@ const NotificationService = {
         $set: { read: true } 
       }
     );
+    console.log(userId);
+    console.log(result);
 
     if (result.modifiedCount > 0) {
       io.to(userId).emit('notificationsMarkedRead');

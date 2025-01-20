@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const notification_model_1 = require("./notification.model");
+// notification.service.ts
 const server_1 = require("../../server");
+const notification_model_1 = require("./notification.model");
 const NotificationService = {
     createNotification(data) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -50,6 +51,8 @@ const NotificationService = {
             }, {
                 $set: { read: true }
             });
+            console.log(userId);
+            console.log(result);
             if (result.modifiedCount > 0) {
                 server_1.io.to(userId).emit('notificationsMarkedRead');
             }

@@ -119,7 +119,7 @@ const unfollowUser = async (payload: TUnfollowUser) => {
     await NotificationService.deleteNotification({
       recipient: followedUserId.toString(),
       sender: userId.toString(),
-      type: 'unfollow',
+      type: 'follow',
     });
 
     // Commit the transaction

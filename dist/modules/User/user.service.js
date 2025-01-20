@@ -90,7 +90,7 @@ const unfollowUser = (payload) => __awaiter(void 0, void 0, void 0, function* ()
         yield notification_service_1.default.deleteNotification({
             recipient: followedUserId.toString(),
             sender: userId.toString(),
-            type: 'unfollow',
+            type: 'follow',
         });
         // Commit the transaction
         yield session.commitTransaction();

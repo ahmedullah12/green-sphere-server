@@ -121,9 +121,7 @@ const deleteGroup = async (groupId: string, userId: string) => {
 const getMyGroups = async (userId: string) => {
   const result = await Group.find({
     members: { $in: [new mongoose.Types.ObjectId(userId)] },
-  })
-    .populate('creator members', 'name profilePhoto')
-    .sort('-createdAt');
+  }).sort('-createdAt');
 
   return result;
 };

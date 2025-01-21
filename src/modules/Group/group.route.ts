@@ -14,8 +14,8 @@ router.post(
   GroupController.createGroup,
 );
 router.get('/', GroupController.getAllGroups);
-router.get('/my-groups', auth("USER", "ADMIN"), GroupController.getMyGroups);
 router.get('/:groupId', GroupController.getSingleGroup);
+router.get('/my-groups/:id', GroupController.getMyGroups);
 router.post('/:groupId/join', auth("USER", "ADMIN"), GroupController.joinGroup);
 router.post('/:groupId/leave', auth("USER", "ADMIN"), GroupController.leaveGroup);
 router.put('/:groupId', auth("USER", "ADMIN"), GroupController.updateGroup);

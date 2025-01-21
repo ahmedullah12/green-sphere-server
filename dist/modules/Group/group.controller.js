@@ -87,7 +87,8 @@ const deleteGroup = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0,
     });
 }));
 const getMyGroups = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield group_service_1.GroupServices.getMyGroups(req.user._id);
+    const { id } = req.params;
+    const result = yield group_service_1.GroupServices.getMyGroups(id);
     (0, sendResponse_1.default)(res, {
         statusCode: http_status_1.default.OK,
         success: true,

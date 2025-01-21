@@ -93,9 +93,7 @@ const deleteGroup = (groupId, userId) => __awaiter(void 0, void 0, void 0, funct
 const getMyGroups = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield group_model_1.Group.find({
         members: { $in: [new mongoose_1.default.Types.ObjectId(userId)] },
-    })
-        .populate('creator members', 'name profilePhoto')
-        .sort('-createdAt');
+    }).sort('-createdAt');
     return result;
 });
 exports.GroupServices = {
